@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Wave AI</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(270deg, #16161a, #282c34);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #chatbot-container {
+            position: fixed;
+            right: -100vw;
+            top: 10vh;
+            width: 100vw;
+            height: 80vh;
+            background: rgba(40, 0, 70, 0.95);
+            border: 3px solid #ff00a6;
+            border-radius: 30px 0 0 30px;
+            transition: right 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 0, 166, 0.5), 0 15px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        #chat-header {
+            padding: 30px;
+            background: linear-gradient(135deg, #ff00a6, #7b00ff);
+            color: #ffffff;
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2), 0 5px 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: rgba(50, 50, 50, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0 0 30px 30px;
+            font-size: 1.2em;
+            scrollbar-width: thin;
+            scrollbar-color: #ff00a6 #280046;
+        }
+
+        #messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        #messages::-webkit-scrollbar-track {
+            background: #280046;
+        }
+        #messages::-webkit-scrollbar-thumb {
+            background-color: #ff00a6;
+            border-radius: 10px;
+            border: 2px solid #280046;
+        }
+
+        .user-message, .bot-message {
+            padding: 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1.3em;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2), 0 5px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .user-message {
+            background: rgba(255, 0, 166, 0.3);
+        }
+        .bot-message {
+            background: rgba(123, 0, 255, 0.3);
+        }
+
+        #user-input {
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            margin-right: 10px;
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1.2em;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #send-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 0, 166, 0.3);
+            color: white;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 15px rgba(255, 0, 166, 0.5);
+        }
+        #send-btn:hover {
+            transform: scale(1.1) translateY(-2px);
+            background: rgba(123, 0, 255, 0.3);
+            box-shadow: 0 0 30px rgba(123, 0, 255, 0.5);
+        }
+
+        #open-chat-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 0, 166, 0.5);
+            color: white;
+            cursor: pointer;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 1000;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 0, 166, 0.7), 0 5px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        #open-chat-btn:hover {
+            transform: scale(1.1) translateY(-2px);
+            background: rgba(123, 0, 255, 0.5);
+            box-shadow: 0 0 30px rgba(123, 0, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+<button id="open-chat-btn">Open Nexus Wave</button>
+
+<div id="chatbot-container">
+    <div id="chat-header">Nexus Wave</div>
+    <div id="messages"></div>
+    <div style="display: flex; margin-top: 10px;">
+        <input type="text" id="user-input" placeholder="Type your message here..." />
+        <button id="send-btn">Send</button>
+    </div>
+</div>
+
+<script>
+    const sendButton = document.getElementById('send-btn');
+    const userInput = document.getElementById('user-input');
+    const messagesContainer = document.getElementById('messages');
+    const chatbotContainer = document.getElementById('chatbot-container');
+    const openChatButton = document.getElementById('open-chat-btn');
+
+    let conversationHistory = [];
+
+    const sendMessage = async () => {
+        const message = userInput.value;
+        if (!message) return;
+
+        messagesContainer.innerHTML += `<div class="user-message"><strong>User:</strong> ${message}</div>`;
+        userInput.value = '';
+
+        conversationHistory.push({ role: "user", content: message });
+
+        // Simulate a bot response
+        const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-Nemo-Instruct-2407', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer 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',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ inputs: message })
+        });
+
+        const data = await response.json();
+
+        messagesContainer.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.generated_text}</div>`;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        conversationHistory.push({ role: "assistant", content: data.generated_text });
+    };
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    openChatButton.addEventListener('click', () => {
+        chatbotContainer.style.right = '0';
+    });
+</script>
+
+</body>
+</html>

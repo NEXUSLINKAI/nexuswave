@@ -1,6 +1,4 @@
-
-            position: fixed;
-            ri<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -171,7 +169,7 @@
         const message = userInput.value;
         if (!message) return;
 
-        messagesContainer.innerHTML += <div class="user-message"><strong>User:</strong> ${message}</div>;
+        messagesContainer.innerHTML += `<div class="user-message"><strong>User:</strong> ${message}</div>`;
         userInput.value = '';
 
         conversationHistory.push({ role: "user", content: message });
@@ -188,10 +186,13 @@
 
         const data = await response.json();
 
-        messagesContainer.innerHTML += <div class="bot-message"><strong>Bot:</strong> ${data.generated_text}</div>;
+        // Check if generated_text exists
+        const botMessage = data.generated_text ? data.generated_text : "Sorry, I didn't get that.";
+
+        messagesContainer.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${botMessage}</div>`;
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-        conversationHistory.push({ role: "assistant", content: data.generated_text });
+        conversationHistory.push({ role: "assistant", content: botMessage });
     };
 
     sendButton.addEventListener('click', sendMessage);
@@ -208,3 +209,4 @@
 
 </body>
 </html>
+

@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+            position: fixed;
+            ri<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -169,7 +171,7 @@
         const message = userInput.value;
         if (!message) return;
 
-        messagesContainer.innerHTML += `<div class="user-message"><strong>User:</strong> ${message}</div>`;
+        messagesContainer.innerHTML += <div class="user-message"><strong>User:</strong> ${message}</div>;
         userInput.value = '';
 
         conversationHistory.push({ role: "user", content: message });
@@ -186,7 +188,7 @@
 
         const data = await response.json();
 
-        messagesContainer.innerHTML += `<div class="bot-message"><strong>Bot:</strong> ${data.generated_text}</div>`;
+        messagesContainer.innerHTML += <div class="bot-message"><strong>Bot:</strong> ${data.generated_text}</div>;
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         conversationHistory.push({ role: "assistant", content: data.generated_text });
@@ -206,4 +208,3 @@
 
 </body>
 </html>
-
